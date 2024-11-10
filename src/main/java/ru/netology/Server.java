@@ -10,15 +10,21 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class Server {
 
     private final int port;
     private final List<String> validPaths;
+    private final ExecutorService executorService;
+    private static final int THREAD_POOL_SIZE = 64;
 
     public Server(int port, List<String> validPaths) {
         this.port = port;
         this.validPaths = validPaths;
+        this.executorService = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
     }
 
     public void start() {
@@ -26,13 +32,23 @@ public class Server {
             while (true) {
                 try {
                     var socket = serverSocket.accept();
-                    handleConnection(socket);
+                    executorService.execute(() -> handleConnection(socket));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            executorService.shutdown();
+            try {
+                if (!executorService.awaitTermination(60, TimeUnit.SECONDS)) {
+                    executorService.shutdownNow();
+                }
+            } catch (InterruptedException e) {
+                executorService.shutdownNow();
+                Thread.currentThread().interrupt();
+            }
         }
     }
 
