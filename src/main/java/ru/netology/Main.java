@@ -1,15 +1,23 @@
 package ru.netology;
 
-import java.util.List;
-
 public class Main {
   public static void main(String[] args) {
-    final var validPaths = List.of("/index.html", "/spring.svg", "/spring.png",
-            "/resources.html", "/styles.css", "/app.js", "/links.html",
-            "/forms.html", "/classic.html", "/events.html", "/events.js");
+    final var server = new Server();
 
-    Server server = new Server(9999, validPaths);
-    server.start();
+    // Добавляем обработчики для различных методов и путей
+    server.addHandler("GET", "/messages", (request, responseStream) -> {
+      String responseContent = "List of messages";
+      Response response = new Response("200 OK", "text/plain", responseContent.length(), responseContent.getBytes());
+      server.sendResponse(responseStream, response);
+    });
+
+    server.addHandler("POST", "/messages", (request, responseStream) -> {
+      String responseContent = "Message received";
+      Response response = new Response("200 OK", "text/plain", responseContent.length(), responseContent.getBytes());
+      server.sendResponse(responseStream, response);
+    });
+
+    server.listen(9999);
   }
 }
 
