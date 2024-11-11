@@ -24,7 +24,10 @@ public class Server {
     }
 
     public void addHandler(String method, String path, Handler handler) {
-        handlers.computeIfAbsent(method, k -> new HashMap<>()).put(path, handler);
+        // Добавлен обработчик, используя только путь без Query String
+        int queryIndex = path.indexOf('?');
+        String pathWithoutQuery = queryIndex > -1 ? path.substring(0, queryIndex) : path;
+        handlers.computeIfAbsent(method, k -> new HashMap<>()).put(pathWithoutQuery, handler);
     }
 
     public void listen(int port) {
@@ -75,8 +78,10 @@ public class Server {
                 return;
             }
 
-            // Find handler based on HTTP method and path
-            Handler handler = handlers.getOrDefault(request.getMethod(), Collections.emptyMap()).get(request.getPath());
+            // Находим обработчик, используя только путь без Query String
+            int queryIndex = request.getPath().indexOf('?');
+            String pathWithoutQuery = queryIndex > -1 ? request.getPath().substring(0, queryIndex) : request.getPath();
+            Handler handler = handlers.getOrDefault(request.getMethod(), Collections.emptyMap()).get(pathWithoutQuery);
             if (handler != null) {
                 handler.handle(request, out);
             } else {

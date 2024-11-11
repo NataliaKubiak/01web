@@ -4,9 +4,9 @@ public class Main {
   public static void main(String[] args) {
     final var server = new Server();
 
-    // Добавляем обработчики для различных методов и путей
     server.addHandler("GET", "/messages", (request, responseStream) -> {
-      String responseContent = "List of messages";
+      //выводим Query Params чтобы убедиться что они корректно распарсились
+      String responseContent = "Query Params:\n" + request.getStringQueryParams();
       Response response = new Response("200 OK", "text/plain", responseContent.length(), responseContent.getBytes());
       server.sendResponse(responseStream, response);
     });
