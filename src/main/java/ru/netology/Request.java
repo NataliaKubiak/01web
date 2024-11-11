@@ -1,16 +1,20 @@
 package ru.netology;
 
-import java.util.Objects;
+import java.util.Map;
 
 public class Request {
     private final String method;
     private final String path;
     private final String version;
+    private final Map<String, String> headers;
+    private final byte[] body;
 
-    public Request(String method, String path, String version) {
+    public Request(String method, String path, String version, Map<String, String> headers, byte[] body) {
         this.method = method;
         this.path = path;
         this.version = version;
+        this.headers = headers;
+        this.body = body;
     }
 
     public String getMethod() {
@@ -25,27 +29,11 @@ public class Request {
         return version;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Request request = (Request) o;
-        return Objects.equals(method, request.method) &&
-                Objects.equals(path, request.path) &&
-                Objects.equals(version, request.version);
+    public Map<String, String> getHeaders() {
+        return headers;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(method, path, version);
-    }
-
-    @Override
-    public String toString() {
-        return "Request{" +
-                "method='" + method + '\'' +
-                ", path='" + path + '\'' +
-                ", version='" + version + '\'' +
-                '}';
+    public byte[] getBody() {
+        return body;
     }
 }
